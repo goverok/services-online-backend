@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: business-service-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: business_service_db
+      POSTGRES_USER: business_service_admin
+      POSTGRES_PASSWORD: rhsv2009
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - business-network
+
+  business-service:
+    container_name: business-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/business_service_db
+      SPRING_DATASOURCE_USERNAME: business_service_admin
+      SPRING_DATASOURCE_PASSWORD: rhsv2009
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_JWT_SECRET: wv7PmIaeV7xRIju0Iii8GnQSd3TM1KlBxNrRFp5Jm5kcV2W5LwfeC4kiIllpgZFhXhbV+yrc/v/rdIFiBLKr9A==
+    networks:
+      - business-network
+
+volumes:
+  pgdata:
+
+networks:
+  business-network:
